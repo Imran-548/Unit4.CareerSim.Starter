@@ -4,17 +4,20 @@ const {
   createProduct,
   findProductById,
   deleteProduct,
+  updateProductById,
 } = require("../utils/utils");
 const router = express.Router();
 
+const isAdmin = require("../middleware/isAdmin");
+
 // Get all products
 router.get("/", async (req, res) => {
-  res.send(await findUsers());
+  res.send(await findProducts());
 });
 
 // Create a new product
-router.post("/", async (req, res) => {
-  console.log(req.body);
+router.post("/", isAdmin, async (req, res) => {
+  console.log(req.user);
   const { name, description, photos_url, price } = req.body;
   const newProduct = await createProduct(name, description, photos_url, price);
   res.status(201).json({
@@ -23,14 +26,50 @@ router.post("/", async (req, res) => {
   });
 });
 
+// Get a product by id
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.status(400).send("Product id is required");
+    return;
+  }
+  const product = await findProductById(id);
+  if (!product) {
+    res.status(404).send("Product not found");
+    return;
+  }
+  res.status(200).json(product);
+});
+
 // Update a product by id
-router.put("/", (req, res) => {
-  res.send("Hello From Auth!");
+router.put("/:id", isAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { name, description, photos_url, price } = req.body;
+  if (!id) {
+    res.status(400).send("Product id is required");
+    return;
+  }
+  // Check if product exists
+  const product = await findProductById(id);
+  if (!product) {
+    res.status(404).send("Product not found");
+    return;
+  }
+  const updatedProduct = await updateProductById(
+    id,
+    name,
+    description,
+    photos_url,
+    price
+  );
+  res.status(200).json({
+    message: "Product updated",
+    product: updatedProduct,
+  });
 });
 
 // Delete a product by id
-ro;
-uter.delete("/:id", async (req, res) => {
+router.delete("/:id", isAdmin, async (req, res) => {
   const { id } = req.params;
   if (!id) {
     res.status(400).send("Product id is required");

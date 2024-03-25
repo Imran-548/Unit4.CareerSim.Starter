@@ -1,26 +1,29 @@
+DROP TABLE IF EXISTS carts;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS users;
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email VARCHAR(225),
-    password VARCHAR(225),
-    access_token VARCHAR(225)
+    email VARCHAR(225) UNIQUE NOT NULL,
+    password VARCHAR(225) NOT NULL,
+    access_token TEXT,
+    admin BOOLEAN DEFAULT FALSE NOT NULL
 );
 
 CREATE TABLE products (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(225),
-    description VARCHAR(225),
-    photos_url TEXT,
-    price DECIMAL(10,2)
+    name VARCHAR(225) NOT NULL,
+    description VARCHAR(225) NOT NULL,
+    photos_url TEXT ,
+    price DECIMAL(10,2) NOT NULL
 );
 
 CREATE TABLE carts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID,
-    product_id UUID,
+    user_id UUID NOT NULL,
+    product_id UUID NOT NULL,
     quantity INT,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (product_id) REFERENCES products (id)

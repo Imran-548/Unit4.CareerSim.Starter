@@ -1,16 +1,89 @@
 const client = require("../config/pgClient");
+const isAdmin = require("../middleware/isAdmin");
 
+// Creating things
 const createUser = async (email, password) => {
   try {
-    const user = await client.query(
+    const { rows } = await client.query(
       "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
       [email, password]
     );
-    return user.rows[0];
+    return rows[0];
   } catch (error) {
     throw new Error(error);
   }
 };
+
+const createProduct = async (name, description, photos_url, price) => {
+  try {
+    const { rows } = await client.query(
+      "INSERT INTO products (name, description, photos_url, price) VALUES ($1, $2, $3, $4) RETURNING *",
+      [name, description, photos_url, price]
+    );
+    return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+// Finding Things
+
+const findUserByEmail = async (email) => {
+  try {
+    const { rows } = await client.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+    return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const findUserById = async (id) => {
+  try {
+    const { rows } = await client.query("SELECT * FROM users WHERE id = $1", [
+      id,
+    ]);
+    return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const findProducts = async () => {
+  try {
+    const { rows } = await client.query("SELECT * FROM products");
+    return rows;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const findProductById = async (id) => {
+  try {
+    const { rows } = await client.query(
+      "SELECT * FROM products WHERE id = $1",
+      [id]
+    );
+    return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const updateProductById = async (id, name, description, photos_url, price) => {
+  try {
+    const { rows } = await client.query(
+      "UPDATE products SET name = $2, description = $3, photos_url = $4, price = $5 WHERE id = $1 RETURNING *",
+      [id, name, description, photos_url, price]
+    );
+    return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+// Updating things
 
 const updateToken = async (id, token) => {
   try {
@@ -22,56 +95,39 @@ const updateToken = async (id, token) => {
   }
 };
 
-const findUserByEmail = async (email) => {
+const updateUserById = async (id, admin) => {
   try {
-    const user = await client.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
-    return user.rows[0];
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const findProducts = async () => {
-  try {
-    const products = await client.query("SELECT * FROM products");
-    return products.rows;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const createProduct = async (name, description, photos_url, price) => {
-  try {
-    const user = await client.query(
-      "INSERT INTO products (name, description, photos_url, price) VALUES ($1, $2, $3, $4) RETURNING *",
-      [name, description, photos_url, price]
+    const { rows } = await client.query(
+      "UPDATE users SET admin = $2 WHERE id = $1 RETURNING id,email, admin",
+      [id, admin]
     );
-    return user.rows[0];
+    return rows[0];
   } catch (error) {
     throw new Error(error);
   }
 };
 
-const findProductById = async (id) => {
-  try {
-    const product = await client.query("SELECT * FROM products WHERE id = $1", [
-      id,
-    ]);
-    return product.rows[0];
-  } catch (error) {
-    throw new Error(error);
-  }
-};
+// Deleting things
 
 const deleteProduct = async (id) => {
   try {
-    const product = await client.query(
+    const { rows } = await client.query(
       "DELETE FROM products WHERE id = $1 RETURNING *",
       [id]
     );
-    return product.rows;
+    return rows;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const deleteUserById = async (id) => {
+  try {
+    const { rows } = await client.query(
+      "DELETE FROM users WHERE id = $1 RETURNING *",
+      [id]
+    );
+    return rows;
   } catch (error) {
     throw new Error(error);
   }
@@ -79,8 +135,8 @@ const deleteProduct = async (id) => {
 
 const findUsers = async () => {
   try {
-    const users = await client.query("SELECT * FROM users");
-    return users.rows;
+    const { rows } = await client.query("SELECT id,email,admin FROM users ");
+    return rows;
   } catch (error) {
     throw new Error(error);
   }
@@ -95,6 +151,10 @@ module.exports = {
   findProductById,
   deleteProduct,
   findUsers,
+  findUserById,
+  deleteUserById,
+  updateUserById,
+  updateProductById,
 };
 
 //change commits made

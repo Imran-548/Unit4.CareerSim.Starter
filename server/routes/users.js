@@ -1,19 +1,39 @@
 const express = require("express");
 const router = express.Router();
+const { findUsers, findUserById, updateUserById } = require("../utils/utils");
 
 // Get all users
 router.get("/", async (req, res) => {
-  res.send(await findUsers());
+  res.status(200).send(await findUsers());
 });
 
 // Get user by id
-router.get("/", (req, res) => {
-  res.send("Hello From Auth!");
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.status(400).send("User id is required");
+    return;
+  }
+  res.status(200).send(await findUserById(id));
 });
 
-// Update user
-router.put("/", (req, res) => {
-  res.send("Hello From Auth!");
+// Update User by Id
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { admin } = req.body;
+  if (!id) {
+    res.status(400).send("User id is required");
+    return;
+  }
+  const user = await findUserById(id);
+  if (!user) {
+    res.status(404).send("User not found");
+    return;
+  }
+  await updateUserById(id, admin);
+  res.status(200).json({
+    message: "User updated",
+  });
 });
 
 // Delete user
@@ -26,10 +46,10 @@ router.delete("/:id", async (req, res) => {
   const user = await findUserById(id);
   console.log(user);
   if (!user) {
-    res.status(404).send("Product not found");
+    res.status(404).send("User not found");
     return;
   }
-  await deleteProduct(id);
+  await deleteUserById(id);
   res.status(200).json({
     message: "Product deleted",
   });
