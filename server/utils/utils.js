@@ -77,6 +77,15 @@ const deleteProduct = async (id) => {
   }
 };
 
+const findUsers = async () => {
+  try {
+    const users = await client.query("SELECT * FROM users");
+    return users.rows;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 module.exports = {
   createUser,
   findUserByEmail,
@@ -85,6 +94,7 @@ module.exports = {
   createProduct,
   findProductById,
   deleteProduct,
+  findUsers,
 };
 
 //change commits made

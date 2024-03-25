@@ -9,7 +9,7 @@ const router = express.Router();
 
 // Get all products
 router.get("/", async (req, res) => {
-  res.send(await findProducts());
+  res.send(await findUsers());
 });
 
 // Create a new product
@@ -29,7 +29,8 @@ router.put("/", (req, res) => {
 });
 
 // Delete a product by id
-router.delete("/:id", async (req, res) => {
+ro;
+uter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   if (!id) {
     res.status(400).send("Product id is required");
@@ -42,7 +43,6 @@ router.delete("/:id", async (req, res) => {
     return;
   }
   await deleteProduct(id);
-
   res.status(200).json({
     message: "Product deleted",
   });
