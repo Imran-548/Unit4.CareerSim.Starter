@@ -8,15 +8,16 @@ const verifyJWT = require("../middleware/verifyJWT");
 router.get("/", verifyJWT, async (req, res) => {
   const { id } = req.user;
   const cart = await findCart(id);
+  console.log(cart);
   if (!cart) {
     return res.status(200).json({
       message: "New cart Created",
       cart: await createCart(id),
     });
   }
-  res.status.json({
+  res.status(200).json({
     message: "success",
-    cart: await findCart(req.user.id),
+    cart: cart,
   });
 });
 
@@ -32,9 +33,9 @@ router.post("/", verifyJWT, async (req, res) => {
 });
 
 // Update a product by id
-router.put("/:id", isAdmin, async (req, res) => {});
+router.put("/:id", verifyJWT, async (req, res) => {});
 
 // Delete a product by id
-router.delete("/:id", isAdmin, async (req, res) => {});
+router.delete("/:id", verifyJWT, async (req, res) => {});
 
 module.exports = router;

@@ -104,11 +104,12 @@ const findUsers = async () => {
   }
 };
 
-const findCart = async (id) => {
+const findCart = async (user_id) => {
   try {
-    const { rows } = await client.query("SELECT * FROM carts WHERE id = $1", [
-      id,
-    ]);
+    const { rows } = await client.query(
+      "SELECT * FROM carts WHERE user_id = $1",
+      [user_id]
+    );
     return rows[0];
   } catch (error) {
     throw new Error(error);
