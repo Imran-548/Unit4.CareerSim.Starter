@@ -23,9 +23,18 @@ CREATE TABLE products (
 CREATE TABLE carts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL,
+    quantity INT,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE cartItems (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL,
+    cart_id UUID NOT NULL,
     product_id UUID NOT NULL,
     quantity INT,
     FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (cart_id) REFERENCES carts (id),
     FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
