@@ -1,5 +1,5 @@
 const express = require("express");
-const { findCart, createCart } = require("../utils/utils");
+const { findCart, createCart, addToCart } = require("../utils/utils");
 const router = express.Router();
 
 const verifyJWT = require("../middleware/verifyJWT");
@@ -23,10 +23,11 @@ router.get("/", verifyJWT, async (req, res) => {
 // Add to cart
 router.post("/", verifyJWT, async (req, res) => {
   const { id } = req.user;
-
+  const { cartId, productId, quantity } = req.body;
+  const cartItem = await addToCart(id, cartId, productId, quantity);
   res.status(201).json({
-    message: "New cart created",
-    cart: newCart,
+    message: "Item(s) added",
+    cartItem: cartItem,
   });
 });
 

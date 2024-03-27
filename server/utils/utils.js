@@ -29,8 +29,20 @@ const createProduct = async (name, description, photos_url, price) => {
 const createCart = async (userId) => {
   try {
     const { rows } = await client.query(
-      "INSERT INTO carts (userId) VALUES ($1) RETURNING *",
+      "INSERT INTO carts (user_id) VALUES ($1) RETURNING *",
       [userId]
+    );
+    return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const addToCart = async (userId, cartId, productId, quantity) => {
+  try {
+    const { rows } = await client.query(
+      "INSERT INTO cartItems (user_id, cart_id, product_id, quantity) VALUES ($1,$2,$3,$4) RETURNING *",
+      [userId, cartId, productId, quantity]
     );
     return rows[0];
   } catch (error) {
@@ -180,6 +192,7 @@ module.exports = {
   updateProductById,
   findCart,
   createCart,
+  addToCart,
 };
 
 //change commits made
