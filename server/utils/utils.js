@@ -190,6 +190,18 @@ const deleteUserById = async (id) => {
   }
 };
 
+const deleteCart = async (id) => {
+  try {
+    const { rows } = await client.query(
+      "DELETE FROM cart WHERE id = $1 RETURNING *",
+      [id]
+    );
+    return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 module.exports = {
   createUser,
   findUserByEmail,
@@ -207,6 +219,7 @@ module.exports = {
   createCart,
   addToCart,
   updateCartById,
+  deleteCart,
 };
 
 //change commits made

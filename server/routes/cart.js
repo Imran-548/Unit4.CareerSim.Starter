@@ -5,6 +5,8 @@ const {
   addToCart,
   updateProductById,
   updateCartById,
+  deleteCart,
+  findCartById,
 } = require("../utils/utils");
 const router = express.Router();
 
@@ -59,18 +61,17 @@ router.put("/:id", verifyJWT, async (req, res) => {
 router.delete("/:id", isAdmin, async (req, res) => {
   const { id } = req.params;
   if (!id) {
-    res.status(400).send("Product id is required");
+    res.status(400).send("Cart id is required");
     return;
   }
-  const product = await findProductById(id);
-  console.log(product);
-  if (!product) {
-    res.status(404).send("Product not found");
+  const cart = await findCart(id);
+  if (!cart) {
+    res.status(404).send("Cart not found");
     return;
   }
-  await deleteProduct(id);
+  await deleteCart(id);
   res.status(200).json({
-    message: "Product deleted",
+    message: "Cart deleted",
   });
 });
 
