@@ -118,13 +118,13 @@ const findCart = async (user_id) => {
 
 // Updating things
 
-const updateProductById = async (id, name, description, photos_url, price) => {
+const updateCartById = async (cart_id, product_id, quantity, user_id) => {
   try {
     const { rows } = await client.query(
-      "UPDATE products SET name = $2, description = $3, photos_url = $4, price = $5 WHERE id = $1 RETURNING *",
-      [id, name, description, photos_url, price]
+      "INSERT INTO cartItems(cart_id, product_id, quantity, user_id) VALUES ($1, $2, $3, $4) ON CONFLICT (cart_id, product_id) DO UPDATE SET quantity = $3 RETURNING *",
+      [cart_id, product_id, quantity, user_id]
     );
-    return rows[0];
+    return rows;
   } catch (error) {
     throw new Error(error);
   }
@@ -145,6 +145,18 @@ const updateUserById = async (id, admin) => {
     const { rows } = await client.query(
       "UPDATE users SET admin = $2 WHERE id = $1 RETURNING id,email, admin",
       [id, admin]
+    );
+    return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const updateProductById = async (id, name, description, photos_url, price) => {
+  try {
+    const { rows } = await client.query(
+      "UPDATE products SET name = $2, description = $3, photos_url = $4, price = $5 WHERE id = $1 RETURNING *",
+      [id, name, description, photos_url, price]
     );
     return rows[0];
   } catch (error) {
@@ -194,6 +206,7 @@ module.exports = {
   findCart,
   createCart,
   addToCart,
+  updateCartById,
 };
 
 //change commits made
