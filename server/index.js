@@ -7,6 +7,20 @@ const client = require("./config/pgClient");
 const { findProducts, findUsers } = require("./utils/utils");
 const isAdmin = require("./middleware/isAdmin");
 
+const cors = require("cors");
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:5173",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    withCredentials: true,
+  })
+);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
