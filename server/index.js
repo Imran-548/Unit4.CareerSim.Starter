@@ -33,12 +33,12 @@ app.use("/api/orders", require("./routes/orders"));
 app.use("/api/products", require("./routes/products"));
 app.use("/api/cart", require("./routes/cart"));
 
-app.use(isAdmin);
-app.use("/api/users", require("./routes/users"));
-
 app.all("*", (req, res) => {
   return res.status(404).json({ error: "404 Not Found" });
 });
+
+app.use(isAdmin);
+app.use("/api/users", require("./routes/users"));
 
 const init = async () => {
   await client.connect();
