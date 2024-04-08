@@ -44,7 +44,6 @@ const init = async () => {
   await client.connect();
   console.log("Connected to Postgres");
 
-  console.log(await findUsers());
   console.log(await findProducts());
 
   app.listen(port, () => {

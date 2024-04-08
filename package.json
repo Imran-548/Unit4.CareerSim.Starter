@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server",
-    "db": "psql -d ecommerce_db -f ./server/db/db.sql",
+    "db": "PGPASSWORD=DBSBZiBfQ2ZwseMr3wZ39qx7dC2nKc0r psql -h dpg-co9jaltjm4es73b092m0-a.oregon-postgres.render.com -U capston_backend_user capston_backend -f ./server/db/db.sql",
     "start:dev": "NODE_ENV=development nodemon server --legacy-watch "
   },
   "keywords": [],

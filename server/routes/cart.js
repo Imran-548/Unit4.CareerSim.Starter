@@ -11,6 +11,7 @@ const {
 const router = express.Router();
 
 const verifyJWT = require("../middleware/verifyJWT");
+const isAdmin = require("../middleware/isAdmin");
 
 // Get Cart
 router.get("/", verifyJWT, async (req, res) => {
