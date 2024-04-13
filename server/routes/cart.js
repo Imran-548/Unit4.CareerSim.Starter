@@ -59,12 +59,8 @@ router.put("/:id", verifyJWT, async (req, res) => {
 });
 
 // Delete a cart by id
-router.delete("/:id", isAdmin, async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    res.status(400).send("Cart id is required");
-    return;
-  }
+router.delete("/", verifyJWT, async (req, res) => {
+  const { id } = req.user;
   const cart = await findCart(id);
   if (!cart) {
     res.status(404).send("Cart not found");
