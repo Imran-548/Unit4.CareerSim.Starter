@@ -130,6 +130,18 @@ const updateCartById = async (cart_id, product_id, quantity, user_id) => {
   }
 };
 
+const updateCartProductById = async (cartId, productId, quantity, id) => {
+  try {
+    const { rows } = await client.query(
+      "UPDATE cartItems SET quantity = $1 WHERE cart_id = $2 AND product_id = $3 AND user_id = $4 RETURNING *",
+      [quantity, cartId, productId, id]
+    );
+    return rows;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const updateToken = async (id, token) => {
   try {
     await client.query(
@@ -220,6 +232,7 @@ module.exports = {
   addToCart,
   updateCartById,
   deleteCart,
+  updateCartProductById,
 };
 
 //change commits made

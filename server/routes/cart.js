@@ -3,7 +3,7 @@ const {
   findCart,
   createCart,
   addToCart,
-  updateProductById,
+  updateCartProductById,
   updateCartById,
   deleteCart,
   findCartById,
@@ -51,6 +51,24 @@ router.put("/:id", verifyJWT, async (req, res) => {
     return;
   }
   const updatedCart = await updateCartById(id, product_id, quantity, user.id);
+  console.log(updatedCart);
+  res.status(200).json({
+    message: "Cart updated",
+    cartItem: updatedCart,
+  });
+});
+
+router.patch("/", verifyJWT, async (req, res) => {
+  const { id } = req.user;
+  const cart = await findCart(id);
+  const { productId, quantity } = req.body;
+
+  const updatedCartProduct = await updateCartProductById(
+    cart.id,
+    productId,
+    quantity,
+    id
+  );
   console.log(updatedCart);
   res.status(200).json({
     message: "Cart updated",
