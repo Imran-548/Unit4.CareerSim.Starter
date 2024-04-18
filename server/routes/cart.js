@@ -1,8 +1,10 @@
 const express = require("express");
+
 const {
   findCart,
   createCart,
   addToCart,
+  getCartItemsByCartId,
   updateCartProductById,
   updateCartById,
   deleteCart,
@@ -16,14 +18,16 @@ const isAdmin = require("../middleware/isAdmin");
 // Get Cart
 router.get("/", verifyJWT, async (req, res) => {
   const { id } = req.user;
-  const cart = await findCart(id);
-  console.log(cart);
-  if (!cart) {
+  console.log("User ID: ", id);
+  const getCart = await findCart(id);
+  if (!getCart) {
     return res.status(200).json({
       message: "New cart Created",
       cart: await createCart(id),
+      cartItems: [],
     });
   }
+  const cart = await getCartItemsByCartId(getCart.id);
   res.status(200).json({
     message: "success",
     cart: cart,
@@ -33,11 +37,21 @@ router.get("/", verifyJWT, async (req, res) => {
 // Add to cart
 router.post("/", verifyJWT, async (req, res) => {
   const { id } = req.user;
-  const { cartId, productId, quantity } = req.body;
-  const cartItem = await addToCart(id, cartId, productId, quantity);
+  const { product_id, quantity } = req.body;
+  console.log("Product ID: ", product_id);
+  console.log("Quantity: ", quantity);
+  const getCart = await findCart(id);
+  if (!getCart) {
+    return res.status(404).json({
+      message: "Cart not found",
+    });
+  }
+
+  const cartItem = await addToCart(getCart.id, product_id, quantity);
+  const cart = await getCartItemsByCartId(getCart.id);
   res.status(201).json({
     message: "Item(s) added",
-    cartItem: cartItem,
+    cart: cart,
   });
 });
 
@@ -51,7 +65,7 @@ router.put("/:id", verifyJWT, async (req, res) => {
     return;
   }
   const updatedCart = await updateCartById(id, product_id, quantity, user.id);
-  console.log(updatedCart);
+  const cart = await getCartItemsByCartId(getCart.id);
   res.status(200).json({
     message: "Cart updated",
     cartItem: updatedCart,
@@ -61,17 +75,18 @@ router.put("/:id", verifyJWT, async (req, res) => {
 router.patch("/", verifyJWT, async (req, res) => {
   const { id } = req.user;
   const cart = await findCart(id);
-  const { productId, quantity } = req.body;
+  const { product_id, quantity } = req.body;
 
   const updatedCartProduct = await updateCartProductById(
     cart.id,
-    productId,
+    product_id,
     quantity,
     id
   );
-  console.log(updatedCart);
+
   res.status(200).json({
     message: "Cart updated",
+    cartId: cart.id,
     cartItem: updatedCart,
   });
 });
@@ -81,10 +96,10 @@ router.delete("/", verifyJWT, async (req, res) => {
   const { id } = req.user;
   const cart = await findCart(id);
   if (!cart) {
-    res.status(404).send("Cart not found");
-    return;
+    return res.status(404).send("Cart not found");
   }
-  await deleteCart(id);
+  const deleted = await deleteCart(cart.id, cart.user_id);
+  console.log("Deleted: ", deleted);
   res.status(200).json({
     message: "Cart deleted",
   });

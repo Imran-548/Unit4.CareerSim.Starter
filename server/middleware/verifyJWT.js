@@ -15,6 +15,7 @@ const verifyJWT = (req, res, next) => {
       console.log(err);
       return res.status(401).send("Invalid Token");
     }
+
     req.user = decoded;
     next();
   });

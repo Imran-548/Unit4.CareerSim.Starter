@@ -6,6 +6,9 @@ const port = process.env.PORT || 3000;
 const client = require("./config/pgClient");
 const { findProducts, findUsers } = require("./utils/utils");
 const isAdmin = require("./middleware/isAdmin");
+var morgan = require("morgan");
+
+// app.use(morgan("combined"));
 
 const cors = require("cors");
 app.use(
@@ -15,7 +18,7 @@ app.use(
       "http://localhost:3001",
       "http://localhost:5173",
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
     withCredentials: true,
   })
@@ -43,9 +46,6 @@ app.use("/api/users", require("./routes/users"));
 const init = async () => {
   await client.connect();
   console.log("Connected to Postgres");
-
-  console.log(await findProducts());
-
   app.listen(port, () => {
     console.log(`Api is listening at http://localhost:${port}`);
   });

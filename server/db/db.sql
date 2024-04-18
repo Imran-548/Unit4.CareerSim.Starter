@@ -1,6 +1,7 @@
-DROP TABLE IF EXISTS carts;
-DROP TABLE IF EXISTS products;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS cartItems CASCADE;
+DROP TABLE IF EXISTS carts CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -21,21 +22,23 @@ CREATE TABLE products (
 );
 
 CREATE TABLE carts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL,
-    quantity INT,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4() ,
+    user_id UUID,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE cartItems (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL,
+    id BIGSERIAL UNIQUE,
     cart_id UUID NOT NULL,
     product_id UUID NOT NULL,
-    quantity INT,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (cart_id) REFERENCES carts (id),
-    FOREIGN KEY (product_id) REFERENCES products (id)
+    quantity INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    CONSTRAINT cart_id_product_id PRIMARY KEY (cart_id, product_id)
 );
 
 INSERT INTO products (name, description, photos_url, price) VALUES ('Product 1', 'Description 1', 'https://via.placeholder.com/150', 100.00);

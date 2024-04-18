@@ -38,13 +38,13 @@ const createCart = async (userId) => {
   }
 };
 
-const addToCart = async (userId, cartId, productId, quantity) => {
+const addToCart = async (cartId, productId, quantity) => {
   try {
     const { rows } = await client.query(
-      "INSERT INTO cartItems (user_id, cart_id, product_id, quantity) VALUES ($1,$2,$3,$4) RETURNING *",
-      [userId, cartId, productId, quantity]
+      "INSERT INTO cartItems (cart_id, product_id, quantity) VALUES ($1, $2, $3) ON CONFLICT ON CONSTRAINT cart_id_product_id DO UPDATE SET quantity = $3 RETURNING *",
+      [cartId, productId, quantity]
     );
-    return rows[0];
+    return rows;
   } catch (error) {
     throw new Error(error);
   }
@@ -76,7 +76,9 @@ const findUserById = async (id) => {
 
 const findProducts = async () => {
   try {
-    const { rows } = await client.query("SELECT * FROM products");
+    const { rows } = await client.query(
+      "SELECT id, name, description, photos_url, price FROM products "
+    );
     return rows;
   } catch (error) {
     throw new Error(error);
@@ -107,10 +109,23 @@ const findUsers = async () => {
 const findCart = async (user_id) => {
   try {
     const { rows } = await client.query(
-      "SELECT * FROM carts WHERE user_id = $1",
+      "SELECT * FROM carts  WHERE user_id = $1",
       [user_id]
     );
+    console.log(rows);
     return rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const getCartItemsByCartId = async (cartId) => {
+  try {
+    const { rows } = await client.query(
+      "SELECT cartItems.cart_id, cartItems.product_id, cartItems.quantity, products.name, products.price, products.photos_url FROM cartItems JOIN products ON cartItems.product_id = products.id WHERE cartItems.cart_id = $1",
+      [cartId]
+    );
+    return rows;
   } catch (error) {
     throw new Error(error);
   }
@@ -202,11 +217,12 @@ const deleteUserById = async (id) => {
   }
 };
 
-const deleteCart = async (id) => {
+const deleteCart = async (cartId, userId) => {
+  console.log(cartId, userId);
   try {
     const { rows } = await client.query(
-      "DELETE FROM cart WHERE id = $1 RETURNING *",
-      [id]
+      "DELETE FROM carts WHERE id = $1 AND user_id = $2  RETURNING *",
+      [cartId, userId]
     );
     return rows[0];
   } catch (error) {
@@ -233,6 +249,7 @@ module.exports = {
   updateCartById,
   deleteCart,
   updateCartProductById,
+  getCartItemsByCartId,
 };
 
 //change commits made
